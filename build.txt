@@ -1,0 +1,4 @@
+buildIgnore = *.csproj, *.user, obj\*, bin\*, .vs\* 
+displayName = Hardmedcore
+author = SevenS
+version = 0.1
