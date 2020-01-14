@@ -3,15 +3,16 @@ using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 
-namespace Hardmedcore.PlayerMods
+namespace Hardmedcore.NPCs
 {
     // [AutoloadHead] and npc.townNPC are extremely important and absolutely both necessary for any Town NPC to work at all.
     [AutoloadHead]
     public class MadaoNPC : ModNPC
     {
+        private bool chat2 = false;
+        private bool chat2prev = false;
         public override string Texture => "Hardmedcore/NPCs/MADAO";
-        public override string[] AltTextures => new[] { "Hardmedcore/NPCs/MADAO" };
-
+        public override string[] AltTextures => new[] { "Hardmedcore/NPCs/MADAO" };    
         public override bool Autoload(ref string name)
         {
             name = "Madao";
@@ -46,7 +47,7 @@ namespace Hardmedcore.PlayerMods
             npc.DeathSound = SoundID.NPCDeath1;
             npc.knockBackResist = 0.5f;
             //npc.homeless = true;
-            animationType = NPCID.Guide;
+            animationType = NPCID.Merchant;
         }
 
         public override void HitEffect(int hitDirection, double damage)
@@ -72,7 +73,7 @@ namespace Hardmedcore.PlayerMods
 
         public override string TownNPCName()
         {
-            string[] nameList = { "Jibin", "Hasegawa", "Jay", "Jacob", "Shinpachi", "Gintoki" };
+            string[] nameList = { "Jibin", "Jay", "Hasegawa", "Jibin", "Jay", "Jacob", "Jibin", "Jacob" };
             int rand = WorldGen.genRand.Next(nameList.Length-1);
             return nameList[rand];
         }
@@ -81,6 +82,7 @@ namespace Hardmedcore.PlayerMods
 
         public override string GetChat()
         {
+           
             string[] speechList = {
                 "Nani?!?", 
                 "OIII",
@@ -123,26 +125,56 @@ namespace Hardmedcore.PlayerMods
                 "",
                 "Ahhh",
                 "Let's swap pants!",
+                "It's 2020!",
                 "I've been practicing my naruto run!",
                 ""
             };
             int rand = Main.rand.Next(speechList.Length);
-            return speechList[rand];
+            if(chat2 == true)
+            {
+                chat2 = false;
+                return "You got " + Main.LocalPlayer.GetModPlayer<PlayerMods.PlayerMod>().reviveable.ToString() + " lives!";
+            }
+            else
+            {
+                return speechList[rand];
+            }
         }
 
         public override void SetChatButtons(ref string button, ref string button2)
         {
             button = Language.GetTextValue("LegacyInterface.28");
-            button2 = "Give coin";
+            button2 = "Check fortune";
+        }
+
+        public override void SetupShop(Chest shop, ref int nextSlot)
+        {
+            shop.item[nextSlot].SetDefaults(ItemID.CopperCoin);
+            shop.item[nextSlot].shopCustomPrice = 2;
+            nextSlot++;
+            shop.item[nextSlot].SetDefaults(ItemID.MagicalPumpkinSeed);
+            shop.item[nextSlot].shopCustomPrice = 10000;
+            nextSlot++;
+            shop.item[nextSlot].SetDefaults(ItemID.GoodieBag);
+            shop.item[nextSlot].shopCustomPrice = 10000;
+            nextSlot++;
+            shop.item[nextSlot].SetDefaults(ItemID.Present);
+            shop.item[nextSlot].shopCustomPrice = 10000;
+            nextSlot++;
+            shop.item[nextSlot].SetDefaults(ItemID.MolotovCocktail);
+            shop.item[nextSlot].shopCustomPrice = 2500;
+            nextSlot++;
         }
 
         public override void OnChatButtonClicked(bool firstButton, ref bool shop)
         {
             if (firstButton)
             {
+                shop = firstButton;
             }
             else
-            {        
+            {
+                chat2 = true;
             }
         }
 
@@ -158,16 +190,11 @@ namespace Hardmedcore.PlayerMods
             randExtraCooldown = 30;
         }
 
-        public override void TownNPCAttackProj(ref int projType, ref int attackDelay)
-        {
-            projType = mod.ProjectileType("SparklingBall");
-            attackDelay = 1;
-        }
-
         public override void TownNPCAttackProjSpeed(ref float multiplier, ref float gravityCorrection, ref float randomOffset)
         {
             multiplier = 12f;
             randomOffset = 2f;
         }
+
     }
 }
